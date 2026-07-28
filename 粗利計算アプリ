@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>利益計算</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
+    display:flex;
+    justify-content:center;
+    margin:40px 0;
+}
+
+.container{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+    width:420px;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:8px;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+#gramList{
+    max-height:400px;
+    overflow-y:auto;
+    border:1px solid #ccc;
+    border-radius:5px;
+    padding:10px;
+    margin-top:10px;
+}
+
+.gram-item{
+    margin-bottom:8px;
+}
+
+.total{
+    margin-top:15px;
+    font-size:18px;
+    font-weight:bold;
+    color:#0066cc;
+    text-align:center;
+}
+
+.result{
+    margin-top:20px;
+    background:#e8f5e9;
+    padding:15px;
+    border-radius:8px;
+    text-align:center;
+    font-size:26px;
+    font-weight:bold;
+    color:#d60000;
+}
+
+button{
+    width:100%;
+    margin-top:20px;
+    padding:12px;
+    font-size:18px;
+    font-weight:bold;
+    border:none;
+    border-radius:8px;
+    background:#f44336;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#d32f2f;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>利益計算</h2>
+
+<label>グラム数（最大50件）</label>
+
+<div id="gramList"></div>
+
+<div class="total">
+合計グラム：<span id="totalGram">0</span> g
+</div>
+
+<label>買取金額</label>
+<input type="number" id="purchase" value="0">
+
+<label>高買金額合計</label>
+<input type="number" id="high" value="0">
+
+<div class="result">
+結果：<span id="answer">0</span> 円
+</div>
+
+<button id="resetBtn">全てリセット</button>
+
+</div>
+
+<script>
+
+const gramList = document.getElementById("gramList");
+const totalGram = document.getElementById("totalGram");
+const purchase = document.getElementById("purchase");
+const high = document.getElementById("high");
+const answer = document.getElementById("answer");
+const resetBtn = document.getElementById("resetBtn");
+
+// グラム入力欄を50個作成
+for(let i = 1; i <= 50; i++){
+
+    const div = document.createElement("div");
+    div.className = "gram-item";
+
+    div.innerHTML = `
+        <input
+            type="number"
+            class="gram"
+            placeholder="グラム数 ${i}"
+            value="0"
+            min="0"
+            step="0.1">
+    `;
+
+    gramList.appendChild(div);
+
+}
+
+const gramInputs = document.querySelectorAll(".gram");
+
+function calc(){
+
+    let total = 0;
+
+    gramInputs.forEach(input=>{
+        total += Number(input.value) || 0;
+    });
+
+    totalGram.textContent = total.toLocaleString();
+
+    const p = Number(purchase.value) || 0;
+    const h = Number(high.value) || 0;
+
+    // (合計グラム×3000) - (買取金額 - 高買金額)
+    const result = (total * 3000) - (p - h);
+
+    answer.textContent = result.toLocaleString();
+
+    if(result < 0){
+        answer.style.color = "blue";
+    }else{
+        answer.style.color = "#d60000";
+    }
+
+}
+
+// 入力時に自動計算
+gramInputs.forEach(input=>{
+    input.addEventListener("input", calc);
+});
+
+purchase.addEventListener("input", calc);
+high.addEventListener("input", calc);
+
+// リセットボタン
+resetBtn.addEventListener("click", ()=>{
+
+    gramInputs.forEach(input=>{
+        input.value = 0;
+    });
+
+    purchase.value = 0;
+    high.value = 0;
+
+    calc();
+
+});
+
+// 初回計算
+calc();
+
+</script>
+
+</body>
+</html>
